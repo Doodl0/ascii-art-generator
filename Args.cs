@@ -21,12 +21,12 @@ public class Argument
         UsesValue = false;
     }
 
-    public Argument(string n, string f, string af, bool v)
+    public Argument(string n, string f, string af, bool uv)
     {
         Name = n;
         Flag = f;
         AltFlag = af;
-        UsesValue = v;
+        UsesValue = uv;
     }
 
     public Argument(string n, string f, string af, bool uv, int v)
@@ -34,7 +34,7 @@ public class Argument
         Name = n;
         Flag = f;
         AltFlag = af;
-        UsesValue = v;
+        UsesValue = uv;
         Value = v;
     }
 
