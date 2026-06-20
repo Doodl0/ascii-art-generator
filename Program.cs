@@ -11,6 +11,8 @@ class ASCIIArtGen
     {
         var program = new ASCIIArtGen();
         program.ParseArgs(args);
+
+        var img = new Image(args[0], (int)program.width.Value, (int)program.height.Value, 1.0f);
     }
 
     public void ParseArgs(string[] args)
