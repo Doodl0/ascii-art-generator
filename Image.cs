@@ -3,10 +3,13 @@ using SkiaSharp;
 class Image
 {
     public SKBitmap Bitmap { get; set; }
+    public bool UseAlpha { get; set; } = true;
+
+    // Brightness multiplier for whole image
     public float Brightness { get; set; } = 1.0f;
 
     // Default palette from dark to light
-    public char[] Palette = ['%', '#', '*', '+', '=', '-', ':', '.'];
+    public char[] Palette = ['@', '%', '#', '*', '+', '=', '-', ':', '.', ' '];
 
     public Image(string filepath, int? w, int? h, float b)
     {
@@ -19,14 +22,19 @@ class Image
 
     public float CalculatePixelBrightness(SKColor colour)
     {
-        return 0.2126f * colour.Red + 0.7152f * colour.Green + 0.0722f * colour.Blue * this.Brightness;
+        // Calculate pixel luminance then multiply by brightness and include alpha
+        float luminance = (0.2126f * (float)colour.Red + 0.7152f * (float)colour.Green + 0.0722f * (float)colour.Blue);
+        if (UseAlpha) return (luminance * Brightness) + (255 - colour.Alpha);
+        else return (luminance * Brightness);
     }
 
     public char CalculatePixelCharacter(int x, int y)
     {
-        var pixelColour = this.Bitmap.GetPixel(x, y);
-        float pixelBrightness = this.CalculatePixelBrightness(pixelColour);
-        int index = (int)Math.Round((pixelBrightness / 255) * Palette.Length);
-        return this.Palette[index];
+        var pixelColour = Bitmap.GetPixel(x, y);
+        float pixelBrightness = CalculatePixelBrightness(pixelColour);
+        int index = ((int)Math.Round((pixelBrightness / 255) * Palette.Length));
+        if (index > Palette.Length - 1) index = Palette.Length - 1;
+        else if (index < 0) index = 0;
+        return Palette[index];
     }
 }

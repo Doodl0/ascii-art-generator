@@ -4,15 +4,17 @@ using SkiaSharp;
 class ASCIIArtGen
 {
     // Argument defintions
-    Argument height = new Argument("Height", "-h", "--height", true, 64);
-    Argument width = new Argument("Width", "-w", "--width", true, 64);
+    Argument height = new("Height", "-h", "--height", true, 64);
+    Argument width = new("Width", "-w", "--width", true, 64);
+    Argument brightness = new("Brightness", "-b", "--brightness", true, 100);
+    Argument contrast = new("Contrast", "-c", "--contrast", true, 100);
 
     static void Main(string[] args)
     {
         var program = new ASCIIArtGen();
         program.ParseArgs(args);
 
-        var img = new Image(args[0], program.width.Value, program.height.Value, 1.0f);
+        Image img = new(args[0], program.width.Value, program.height.Value, 0.5f);
 
         for (int y = 0; y < img.Bitmap.Height; y++)
         {
@@ -47,7 +49,7 @@ class ASCIIArtGen
                     // If arg has an input value needed, check next input and set value from it
                     if (argsList[j].UsesValue) argsList[j].Value = Int32.Parse(args[i + 1]); i++;
                     // Output debug info
-                    argsList[j].Debug();
+                    argsList[j].Run();
                 }
             }
         }
