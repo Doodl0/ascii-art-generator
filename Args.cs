@@ -48,6 +48,12 @@ public abstract class ArgumentValue<T> : Argument
         AltFlag = af;
         Value = v;
     }
+
+    // Outputs name and value
+    override public void Debug()
+    {
+        Console.WriteLine(Name + " = " + Value);
+    }
 }
 
 public class ArgumentInt : ArgumentValue<int>
@@ -72,12 +78,6 @@ public class ArgumentInt : ArgumentValue<int>
             Environment.Exit(1);
         }
     }
-
-    // Outputs name and value
-    override public void Debug()
-    {
-        Console.WriteLine(Name + " = " + Value);
-    }
 }
 
 public class ArgumentFloat : ArgumentValue<float>
@@ -95,6 +95,32 @@ public class ArgumentFloat : ArgumentValue<float>
         try
         {
             Value = float.Parse(s);
+        }
+        catch
+        {
+            Console.Error.WriteLine("Could not get valid value from " + s + " for argument " + Name);
+            Environment.Exit(1);
+        }
+    }
+
+
+}
+
+public class ArgumentBool : ArgumentValue<bool>
+{
+    public ArgumentBool(string n, string f, string af, bool v) : base(n, f, af, v)
+    {
+        Name = n;
+        Flag = f;
+        AltFlag = af;
+        Value = v;
+    }
+
+    override public void Set(string s)
+    {
+        try
+        {
+            Value = bool.Parse(s);
         }
         catch
         {

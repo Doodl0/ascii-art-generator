@@ -8,13 +8,15 @@ class ASCIIArtGen
     ArgumentInt width = new("Width", "-w", "--width", 64);
     ArgumentFloat brightness = new("Brightness", "-b", "--brightness", 1.0f);
     ArgumentFloat contrast = new("Contrast", "-c", "--contrast", 1.0f);
+    ArgumentFloat saturation = new("Saturation", "-s", "--saturation", 1.0f);
+    ArgumentBool useAlpha = new("Use Alpha", "-a", "--use-alpha", true);
 
     static void Main(string[] args)
     {
         var program = new ASCIIArtGen();
         program.ParseArgs(args);
 
-        Image img = new(args[0], program.width.Value, program.height.Value, 0.5f);
+        Image img = new(args[0], program.width.Value, program.height.Value, program.brightness.Value, program.contrast.Value, program.saturation.Value, program.useAlpha.Value);
 
         for (int y = 0; y < img.Bitmap.Height; y++)
         {
@@ -44,6 +46,8 @@ class ASCIIArtGen
         argsList.Add(width);
         argsList.Add(brightness);
         argsList.Add(contrast);
+        argsList.Add(saturation);
+        argsList.Add(useAlpha);
 
         // Loop through inputted args, skipping first
         for (int input = 1; input < inputArgs.Length; input++)
