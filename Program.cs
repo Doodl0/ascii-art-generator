@@ -4,10 +4,10 @@ using SkiaSharp;
 class ASCIIArtGen
 {
     // Argument defintions
-    Argument height = new("Height", "-h", "--height", true, 64);
-    Argument width = new("Width", "-w", "--width", true, 64);
-    Argument brightness = new("Brightness", "-b", "--brightness", true, 100);
-    Argument contrast = new("Contrast", "-c", "--contrast", true, 100);
+    ArgumentInt height = new("Height", "-h", "--height", 64);
+    ArgumentInt width = new("Width", "-w", "--width", 64);
+    ArgumentFloat brightness = new("Brightness", "-b", "--brightness", 1.0f);
+    ArgumentFloat contrast = new("Contrast", "-c", "--contrast", 1.0f);
 
     static void Main(string[] args)
     {
@@ -28,28 +28,47 @@ class ASCIIArtGen
 
     }
 
-    public void ParseArgs(string[] args)
+    public void ParseArgs(string[] inputArgs)
     {
         // Arg 0 is always filepath
-        // Check validity of filepath
-        if (File.Exists(args[0])) Console.WriteLine("Filepath valid");
-        else Console.WriteLine("Filepath invalid");
+        // Check validity of filepath, close if invalid
+        if (File.Exists(inputArgs[0])) Console.WriteLine("Filepath valid");
+        else
+        {
+            Console.Error.WriteLine("Filepath invalid");
+            Environment.Exit(1);
+        }
 
-        Argument[] argsList = [height, width];
+        List<Argument> argsList = new();
+        argsList.Add(height);
+        argsList.Add(width);
+        argsList.Add(brightness);
+        argsList.Add(contrast);
 
-        // Loop through inputted args
-        for (int i = 1; i < args.Length; i++)
+        // Loop through inputted args, skipping first
+        for (int input = 1; input < inputArgs.Length; input++)
         {
             // Loop through valid args
-            for (int j = 0; j < argsList.Length; j++)
+            foreach (Argument arg in argsList)
             {
                 // Check if input is in args list
-                if (argsList[j].MatchesFlag(args[i]))
+                if (arg.MatchesFlag(inputArgs[input]))
                 {
-                    // If arg has an input value needed, check next input and set value from it
-                    if (argsList[j].UsesValue) argsList[j].Value = Int32.Parse(args[i + 1]); i++;
-                    // Output debug info
-                    argsList[j].Run();
+                    // Check if arg requires value
+                    if (arg.HasValue)
+                    {
+                        // Try catch to catch any out of boundary errors if a value has not been included
+                        try
+                        {
+                            arg.Set(inputArgs[input + 1]);
+                            arg.Debug();
+                        }
+                        catch
+                        {
+                            Console.Error.WriteLine("Could not find required value for " + arg.Name);
+                            Environment.Exit(1);
+                        }
+                    }
                 }
             }
         }
