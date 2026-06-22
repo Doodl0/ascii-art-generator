@@ -6,19 +6,22 @@ public abstract class Argument
     public string Flag { get; set; }
     public string? AltFlag { get; set; }
     public abstract bool HasValue { get; }
+    public string HelpDescription { get; set; }
 
     // Constructors
-    public Argument(string n, string f)
+    public Argument(string n, string f, string h)
     {
         Name = n;
         Flag = f;
+        HelpDescription = h;
     }
 
-    public Argument(string n, string f, string af)
+    public Argument(string n, string f, string af, string h)
     {
         Name = n;
         Flag = f;
         AltFlag = af;
+        HelpDescription = h;
     }
 
     // Check if inputted flag matches either flag
@@ -40,12 +43,13 @@ public abstract class ArgumentValue<T> : Argument
     public override bool HasValue { get; } = true;
 
     // Constructor for an argument with a default value
-    public ArgumentValue(string n, string f, string af, T v) : base(n, f, af)
+    public ArgumentValue(string n, string f, string af, T v, string h) : base(n, f, af, h)
     {
         Name = n;
         Flag = f;
         AltFlag = af;
         Value = v;
+        HelpDescription = h;
     }
 
     // Outputs name and value
@@ -55,14 +59,44 @@ public abstract class ArgumentValue<T> : Argument
     }
 }
 
+public class ArgumentNoValue : Argument
+{
+    public override bool HasValue { get; } = false;
+    // Constructors
+    public ArgumentNoValue(string n, string f, string h) : base(n, f, h)
+    {
+        Name = n;
+        Flag = f;
+        HelpDescription = h;
+    }
+
+    public ArgumentNoValue(string n, string f, string af, string h) : base(n, f, af, h)
+    {
+        Name = n;
+        Flag = f;
+        AltFlag = af;
+        HelpDescription = h;
+    }
+
+    // Set is blank as no value to set
+    override public void Set(string s) { }
+
+    // Outputs name
+    override public void Debug()
+    {
+        Console.WriteLine(Name);
+    }
+}
+
 public class ArgumentInt : ArgumentValue<int>
 {
-    public ArgumentInt(string n, string f, string af, int v) : base(n, f, af, v)
+    public ArgumentInt(string n, string f, string af, int v, string h) : base(n, f, af, v, h)
     {
         Name = n;
         Flag = f;
         AltFlag = af;
         Value = v;
+        HelpDescription = h;
     }
 
     override public void Set(string s)
@@ -81,12 +115,13 @@ public class ArgumentInt : ArgumentValue<int>
 
 public class ArgumentFloat : ArgumentValue<float>
 {
-    public ArgumentFloat(string n, string f, string af, float v) : base(n, f, af, v)
+    public ArgumentFloat(string n, string f, string af, float v, string h) : base(n, f, af, v, h)
     {
         Name = n;
         Flag = f;
         AltFlag = af;
         Value = v;
+        HelpDescription = h;
     }
 
     override public void Set(string s)
@@ -107,12 +142,13 @@ public class ArgumentFloat : ArgumentValue<float>
 
 public class ArgumentBool : ArgumentValue<bool>
 {
-    public ArgumentBool(string n, string f, string af, bool v) : base(n, f, af, v)
+    public ArgumentBool(string n, string f, string af, bool v, string h) : base(n, f, af, v, h)
     {
         Name = n;
         Flag = f;
         AltFlag = af;
         Value = v;
+        HelpDescription = h;
     }
 
     override public void Set(string s)
@@ -132,5 +168,60 @@ public class ArgumentBool : ArgumentValue<bool>
     override public void Debug()
     {
         Console.WriteLine(Name + " = " + Value);
+    }
+}
+
+public class ArgumentString : ArgumentValue<string>
+{
+    public ArgumentString(string n, string f, string af, string v, string h) : base(n, f, af, v, h)
+    {
+        Name = n;
+        Flag = f;
+        AltFlag = af;
+        Value = v;
+        HelpDescription = h;
+    }
+
+    override public void Set(string s)
+    {
+        try
+        {
+            Value = s;
+        }
+        catch
+        {
+            Console.Error.WriteLine("Could not get valid value from " + s + " for argument " + Name);
+            Environment.Exit(1);
+        }
+    }
+
+    // Outputs name and value
+    override public void Debug()
+    {
+        Console.WriteLine(Name + " = " + Value);
+    }
+}
+
+public class ArgumentFilepath : ArgumentString
+{
+    public ArgumentFilepath(string n, string f, string af, string v, string h) : base(n, f, af, v, h)
+    {
+        Name = n;
+        Flag = f;
+        AltFlag = af;
+        Value = v;
+        HelpDescription = h;
+    }
+    override public void Set(string s)
+    {
+        if (File.Exists(s))
+        {
+            Value = s;
+        }
+        else
+        {
+            Console.Error.WriteLine("Could not get valid filepath from " + s + " for argument " + Name);
+            Environment.Exit(1);
+        }
     }
 }
