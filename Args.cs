@@ -1,4 +1,3 @@
-
 // Base class for all arguments
 public abstract class Argument
 {
