@@ -214,11 +214,12 @@ public class ArgumentFilepath : ArgumentString
     }
     override public void Set(string s)
     {
-        if (File.Exists(s))
+        try
         {
+            Path.GetFullPath(s);
             Value = s;
         }
-        else
+        catch
         {
             Console.Error.WriteLine("Could not get valid filepath from " + s + " for argument " + Name);
             Environment.Exit(1);

@@ -81,4 +81,9 @@ class Image
         v = Math.Clamp(v * Brightness, 0f, 100f);
         return SKColor.FromHsv(h, s, v, c.Alpha);
     }
+
+    //public float[2] Sobel(int x, int y)
+    //{
+    //    var pixels
+    //}
 }

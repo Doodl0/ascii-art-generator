@@ -5,13 +5,14 @@ using SkiaSharp;
 class ASCIIArtGen
 {
     // Argument defintions
-    readonly ArgumentNoValue help = new("Help", "--help", "List all options for the program");
-    readonly ArgumentInt height = new("Height", "-h", "--height", 64, "Set the height of the output text (Integer)");
-    readonly ArgumentInt width = new("Width", "-w", "--width", 64, "Set the width of the output text (Integer)");
-    readonly ArgumentFloat brightness = new("Brightness", "-b", "--brightness", 1.0f, "Multiply the brightness of the input image (Decimal)");
-    readonly ArgumentFloat contrast = new("Contrast", "-c", "--contrast", 1.0f, "Multiply the contrast of the input image (Decimal)");
-    readonly ArgumentFloat saturation = new("Saturation", "-s", "--saturation", 1.0f, "Multiply the saturation of the input image (Decimal)");
-    readonly ArgumentBool useAlpha = new("Use Alpha", "-a", "--use-alpha", true, "Use the alpha channel of the input image ('true' or 'false')");
+    readonly ArgumentNoValue help = new("Help", "--help", "List all options for the program. --help must be ran before a filepath in order to work");
+    readonly ArgumentInt height = new("Height", "-h", "--height", 64, "Set the height of the output text [Integer]");
+    readonly ArgumentInt width = new("Width", "-w", "--width", 64, "Set the width of the output text [Integer]");
+    readonly ArgumentFloat brightness = new("Brightness", "-b", "--brightness", 1.0f, "Multiply the brightness of the input image [Decimal]");
+    readonly ArgumentFloat contrast = new("Contrast", "-c", "--contrast", 1.0f, "Multiply the contrast of the input image [Decimal]");
+    readonly ArgumentFloat saturation = new("Saturation", "-s", "--saturation", 1.0f, "Multiply the saturation of the input image [Decimal]");
+    readonly ArgumentBool useAlpha = new("Use Alpha", "-a", "--use-alpha", true, "Use the alpha channel of the input image ['true' or 'false']");
+    readonly ArgumentFilepath fileOutput = new("File Output", "-f", "--file", "", "Output to a text file [Filepath]");
 
     static void Main(string[] args)
     {
@@ -29,13 +30,42 @@ class ASCIIArtGen
         );
 
         // Loop over all pixels and output a respective character
-        for (int y = 0; y < img.Bitmap.Height; y++)
+        // If user inputs a filepath, write to a file
+        // Else, write to console
+        if (program.fileOutput.Value != "")
         {
-            for (int x = 0; x < img.Bitmap.Width; x++)
+            try
             {
-                Console.Write(img.CalculatePixelCharacter(x, y));
+                using (StreamWriter outputFile = new(program.fileOutput.Value))
+                {
+                    for (int y = 0; y < img.Bitmap.Height; y++)
+                    {
+                        for (int x = 0; x < img.Bitmap.Width; x++)
+                        {
+                            outputFile.Write(img.CalculatePixelCharacter(x, y));
+                        }
+                        outputFile.WriteLine();
+                    }
+                }
+                Console.WriteLine("Outputted to " + program.fileOutput.Value);
             }
-            Console.WriteLine();
+            catch
+            {
+                Console.Error.WriteLine("Could not write to file " + program.fileOutput.Value);
+                Environment.Exit(1);
+            }
+        }
+
+        else
+        {
+            for (int y = 0; y < img.Bitmap.Height; y++)
+            {
+                for (int x = 0; x < img.Bitmap.Width; x++)
+                {
+                    Console.Write(img.CalculatePixelCharacter(x, y));
+                }
+                Console.WriteLine();
+            }
         }
 
     }
@@ -49,8 +79,15 @@ class ASCIIArtGen
             brightness,
             contrast,
             saturation,
-            useAlpha
+            useAlpha,
+            fileOutput
         ];
+
+        if (inputArgs.Length <= 0)
+        {
+            Console.WriteLine("No input arguments found. Run 'ascii-art-gen --help' for a list of all options");
+            Environment.Exit(0);
+        }
 
         // Arg 0 is always filepath or help
         // Check if arg 0 is help
