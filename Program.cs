@@ -6,13 +6,14 @@ class ASCIIArtGen
 {
     // Argument defintions
     readonly ArgumentNoValue help = new("Help", "--help", "List all options for the program. --help must be ran before a filepath in order to work");
-    readonly ArgumentInt height = new("Height", "-h", "--height", 64, "Set the height of the output text [Integer]");
-    readonly ArgumentInt width = new("Width", "-w", "--width", 64, "Set the width of the output text [Integer]");
-    readonly ArgumentFloat brightness = new("Brightness", "-b", "--brightness", 1.0f, "Multiply the brightness of the input image [Decimal]");
-    readonly ArgumentFloat contrast = new("Contrast", "-c", "--contrast", 1.0f, "Multiply the contrast of the input image [Decimal]");
-    readonly ArgumentFloat saturation = new("Saturation", "-s", "--saturation", 1.0f, "Multiply the saturation of the input image [Decimal]");
-    readonly ArgumentBool useAlpha = new("Use Alpha", "-a", "--use-alpha", true, "Use the alpha channel of the input image ['true' or 'false']");
-    readonly ArgumentFilepath fileOutput = new("File Output", "-f", "--file", "", "Output to a text file [Filepath]");
+    readonly ArgumentInt height = new("Height", "-h", "--height", 64, "Set the height of the output text [Integer, default = 64]");
+    readonly ArgumentInt width = new("Width", "-w", "--width", 64, "Set the width of the output text [Integer, default = 64]");
+    readonly ArgumentFloat brightness = new("Brightness", "-b", "--brightness", 1.0f, "Multiply the brightness of the input image [Decimal, default = 1.0]");
+    readonly ArgumentFloat contrast = new("Contrast", "-c", "--contrast", 1.0f, "Multiply the contrast of the input image [Decimal, default = 1.0]");
+    readonly ArgumentFloat saturation = new("Saturation", "-s", "--saturation", 1.0f, "Multiply the saturation of the input image [Decimal, default = 1.0]");
+    readonly ArgumentBool useAlpha = new("Use Alpha", "-a", "--use-alpha", true, "Use the alpha channel of the input image ['true' or 'false', default = true]");
+    readonly ArgumentBool useEdgeDetect = new("Use Edge Detection", "-e", "--edge-detect", false, "Use an edge detection filter over the image ['true' or 'false', default = false]");
+    readonly ArgumentFilepath fileOutput = new("File Output", "-f", "--file", "", "Output to a text file [Filepath, default = none]");
 
     static void Main(string[] args)
     {
@@ -26,7 +27,8 @@ class ASCIIArtGen
             program.brightness.Value,
             program.contrast.Value,
             program.saturation.Value,
-            program.useAlpha.Value
+            program.useAlpha.Value,
+            program.useEdgeDetect.Value
         );
 
         // Loop over all pixels and output a respective character
@@ -80,6 +82,7 @@ class ASCIIArtGen
             contrast,
             saturation,
             useAlpha,
+            useEdgeDetect,
             fileOutput
         ];
 

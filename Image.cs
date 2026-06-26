@@ -4,6 +4,7 @@ class Image
 {
     public SKBitmap Bitmap { get; set; }
     public bool UseAlpha { get; set; } = true;
+    public bool UseEdgeDetect { get; set; } = true;
 
     // Brightness multiplier for whole image
     public float Brightness { get; set; } = 1.0f;
@@ -14,7 +15,7 @@ class Image
     // Default palette from dark to light
     public char[] Palette = ['@', '%', '#', '*', '+', '=', '-', ':', '.', ' '];
 
-    public Image(string filepath, int? w, int? h, float b, float c, float s, bool a)
+    public Image(string filepath, int? w, int? h, float b, float c, float s, bool a, bool e)
     {
         // Catch error in case of file not being an image
         try
@@ -24,7 +25,7 @@ class Image
             int width = w ?? Bitmap.Width;
             int height = h ?? Bitmap.Height;
             // Resize image and set parameters
-            Bitmap = Bitmap.Resize(new SKSizeI(width, height), SKSamplingOptions.Default);
+            Bitmap = Bitmap.Resize(new SKSizeI(width, height), new SKSamplingOptions(SKFilterMode.Nearest, SKMipmapMode.None));
         }
         catch
         {
@@ -35,6 +36,7 @@ class Image
         Contrast = c;
         Saturation = s;
         UseAlpha = a;
+        UseEdgeDetect = e;
     }
 
     public float CalculatePixelLuminance(SKColor colour)
@@ -49,14 +51,22 @@ class Image
     {
         // Sample pixel colour
         var pixelColour = Bitmap.GetPixel(x, y);
+
+        // Apply sobel filter for edge detection
+        if (UseEdgeDetect) pixelColour = Sobel(x, y);
+
         // Apply saturation and brightness modifier to pixel
         pixelColour = ApplyBrightnessSaturation(pixelColour);
+
         // Apply contrast modifier to pixel
         pixelColour = ApplyContrast(pixelColour);
+
         // Calculate pixel luminance
         float pixelBrightness = CalculatePixelLuminance(pixelColour);
+
         // Normalise luminance, then multiply by amount of characters in palette and round
         int index = (int)Math.Round((pixelBrightness / 255) * Palette.Length);
+
         // Catch any out of boundary indexes
         if (index > Palette.Length - 1) index = Palette.Length - 1;
         else if (index < 0) index = 0;
@@ -82,8 +92,42 @@ class Image
         return SKColor.FromHsv(h, s, v, c.Alpha);
     }
 
-    //public float[2] Sobel(int x, int y)
-    //{
-    //    var pixels
-    //}
+    public SKColor Sobel(int x, int y)
+    {
+        // Sample 3x3 grid around pixel, from top left to bottom right
+        // Clamp to prevent sampling out of bounds
+        SKColor[] pixels = {
+            Bitmap.GetPixel(Math.Clamp(x-1, 0, Bitmap.Width-1), Math.Clamp(y-1, 0, Bitmap.Height-1)), Bitmap.GetPixel(Math.Clamp(x, 0, Bitmap.Width-1), Math.Clamp(y-1, 0, Bitmap.Height-1)), Bitmap.GetPixel(Math.Clamp(x+1, 0, Bitmap.Width-1), Math.Clamp(y-1, 0, Bitmap.Height-1)),
+            Bitmap.GetPixel(Math.Clamp(x-1, 0, Bitmap.Width-1), Math.Clamp(y, 0, Bitmap.Height-1)), Bitmap.GetPixel(Math.Clamp(x, 0, Bitmap.Width-1), Math.Clamp(y, 0, Bitmap.Height-1)), Bitmap.GetPixel(Math.Clamp(x+1, 0, Bitmap.Width-1), Math.Clamp(y, 0, Bitmap.Height-1)),
+            Bitmap.GetPixel(Math.Clamp(x-1, 0, Bitmap.Width-1), Math.Clamp(y+1, 0, Bitmap.Height-1)), Bitmap.GetPixel(Math.Clamp(x, 0, Bitmap.Width-1), Math.Clamp(y+1, 0, Bitmap.Height-1)), Bitmap.GetPixel(Math.Clamp(x+1, 0, Bitmap.Width-1), Math.Clamp(y+1, 0, Bitmap.Height-1)),
+        };
+
+        float[] xKernel = {
+            -1,0,1,
+            -2,0,2,
+            -1,0,1
+        };
+
+        float[] yKernel = {
+            -1,-2,-1,
+            0,0,0,
+            1,2,1
+        };
+
+        float gx = 0;
+        float gy = 0;
+
+        for (int i = 0; i < 9; i++)
+        {
+            gx += (pixels[i].Red + pixels[i].Green + pixels[i].Blue) / 3 * xKernel[i];
+        }
+        for (int i = 0; i < 9; i++)
+        {
+            gy += (pixels[i].Red + pixels[i].Green + pixels[i].Blue) / 3 * yKernel[i];
+        }
+        var g = Math.Sqrt(Math.Pow(gx, 2) + Math.Pow(gy, 2));
+
+        var col = (uint)(Math.Clamp(255 - g, 0, 255));
+        return new SKColor((byte)col, (byte)col, (byte)col);
+    }
 }
