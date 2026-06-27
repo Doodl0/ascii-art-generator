@@ -1,10 +1,19 @@
 # ASCII Art Generator
 A CLI tool to generate ASCII art from image files
 
+# Features
+- Convert most image files to ASCII text
+- Customizable output size
+- Adjustable image properties, like brightness, saturation and contrast
+- Alpha channel support
+- Edge detection filter through the Sobel Operator
+- Customisable palettes
+- Create and output to a text file
+
 # Usage
 Run `ascii-art-gen [path-to-image-file]` to convert an image to ASCII.
 
-## Arguments
+### Arguments
 There are also different arguments for modifying the output, which must be added after the image file path. They are listed below, or can be seen through running `ascii-art-gen --help`, which lists all options.
 | Argument                        | Description                                                                             | Value type and default                                |
 |---------------------------------|-----------------------------------------------------------------------------------------|-------------------------------------------------------|
