@@ -27,3 +27,6 @@ There are also different arguments for modifying the output, which must be added
 | `-p`\|`--palette` `[Value]`     | Set palette used to create output text, from darkest character to lightest character    | Text or Filepath to text file, default = `@%#*+=-:. ` |
 | `-f`\|`--file` `[Value]`        | Output to a text file                                                                   | Filepath, default = none                              |
 | `--help`                        | List all options for the program. Must be ran before an input filepath in order to work |                                                       |
+
+# Credits
+[SkiaSharp](https://github.com/mono/SkiaSharp) image processing library
