@@ -29,4 +29,4 @@ There are also different arguments for modifying the output, which must be added
 | `--help`                        | List all options for the program. Must be ran before an input filepath in order to work |                                                       |
 
 # Credits
-[SkiaSharp](https://github.com/mono/SkiaSharp) image processing library
+[SkiaSharp](https://github.com/mono/SkiaSharp) graphics library
