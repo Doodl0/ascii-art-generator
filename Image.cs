@@ -15,7 +15,7 @@ class Image
     // Default palette from dark to light
     public char[] Palette = ['@', '%', '#', '*', '+', '=', '-', ':', '.', ' '];
 
-    public Image(string filepath, int? w, int? h, float b, float c, float s, bool a, bool e)
+    public Image(string filepath, int? w, int? h, float b, float c, float s, bool a, bool e, string p)
     {
         // Catch error in case of file not being an image
         try
@@ -37,6 +37,7 @@ class Image
         Saturation = s;
         UseAlpha = a;
         UseEdgeDetect = e;
+        Palette = p.ToCharArray();
     }
 
     public float CalculatePixelLuminance(SKColor colour)

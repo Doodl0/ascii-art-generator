@@ -13,6 +13,7 @@ class ASCIIArtGen
     readonly ArgumentFloat saturation = new("Saturation", "-s", "--saturation", 1.0f, "Multiply the saturation of the input image [Decimal, default = 1.0]");
     readonly ArgumentBool useAlpha = new("Use Alpha", "-a", "--use-alpha", true, "Use the alpha channel of the input image ['true' or 'false', default = true]");
     readonly ArgumentBool useEdgeDetect = new("Use Edge Detection", "-e", "--edge-detect", false, "Use an edge detection filter over the image ['true' or 'false', default = false]");
+    readonly ArgumentString palette = new("Palette", "-p", "--palette", "@%#*+=-:. ", "Set palette used to create output text, from darkest character to lightest character [Text or Filepath to text file, default = '@%#*+=-:. ']");
     readonly ArgumentFilepath fileOutput = new("File Output", "-f", "--file", "", "Output to a text file [Filepath, default = none]");
 
     static void Main(string[] args)
@@ -28,7 +29,8 @@ class ASCIIArtGen
             program.contrast.Value,
             program.saturation.Value,
             program.useAlpha.Value,
-            program.useEdgeDetect.Value
+            program.useEdgeDetect.Value,
+            program.palette.Value
         );
 
         // Loop over all pixels and output a respective character
@@ -83,6 +85,7 @@ class ASCIIArtGen
             saturation,
             useAlpha,
             useEdgeDetect,
+            palette,
             fileOutput
         ];
 

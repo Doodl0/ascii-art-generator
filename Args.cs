@@ -186,7 +186,21 @@ public class ArgumentString : ArgumentValue<string>
     {
         try
         {
-            Value = s;
+            // If input string is a filepath, read from file instead
+            if (File.Exists(s))
+            {
+                try
+                {
+                    using StreamReader reader = new(s);
+                    Value = reader.ReadToEnd();
+                }
+                catch
+                {
+                    Console.Error.WriteLine("Could not get valid filepath from " + s + " for argument " + Name);
+                    Environment.Exit(1);
+                }
+            }
+            else Value = s;
         }
         catch
         {
